@@ -1,0 +1,67 @@
+.boardContainer {
+    height: calc(100vh - 60px);
+    /* Adjust based on navbar height */
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    position: relative;
+    /* Background will be set inline from the board data */
+    background-size: cover;
+    background-position: center;
+}
+
+.boardHeader {
+    padding: 0.75rem 1.5rem;
+    background: rgba(0, 0, 0, 0.24);
+    backdrop-filter: blur(4px);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: white;
+}
+
+.boardTitle {
+    font-size: 1.25rem;
+    font-weight: 700;
+    margin: 0;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+.boardCanvas {
+    flex: 1;
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding: 1rem;
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+}
+
+/* Scrollbar styling for the horizontal canvas */
+.boardCanvas::-webkit-scrollbar {
+    height: 12px;
+}
+
+.boardCanvas::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.1);
+    border-radius: 6px;
+}
+
+.boardCanvas::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 6px;
+}
+
+.boardCanvas::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.5);
+}
+
+.placeholderList {
+    min-width: 272px;
+    background: #f1f2f4;
+    border-radius: 12px;
+    padding: 0.75rem;
+    color: #172b4d;
+    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
+    opacity: 0.8;
+}

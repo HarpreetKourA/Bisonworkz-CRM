@@ -76,13 +76,129 @@ ALTER TABLE public.cards ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.permissions ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.revenue_logs ENABLE ROW LEVEL SECURITY;
 
--- Users Policy: Users can read everyone (for collaboration) but only update themselves
-CREATE POLICY "Users can view all profiles" ON public.users FOR SELECT USING (true);
-CREATE POLICY "Users can update own profile" ON public.users FOR UPDATE USING (auth.uid() = id);
+-- RLS Helper Function: Check if user has access to a board
+CREATE OR REPLACE FUNCTION public.has_board_access(board_id UUID, required_level text DEFAULT 'view')
+RETURNS boolean AS $$
+DECLARE
+  current_user_id UUID;
+  is_owner BOOLEAN;
+  user_access_level public.permission_type;
+BEGIN
+  current_user_id := auth.uid();
+  
+  -- Check ownership
+  SELECT (owner_id = current_user_id) INTO is_owner FROM public.boards WHERE id = board_id;
+  IF is_owner THEN
+    RETURN true;
+  END IF;
+  
+  -- Check permissions
+  SELECT access_level INTO user_access_level 
+  FROM public.permissions 
+  WHERE resource_id = board_id 
+    AND resource_type = 'board' 
+    AND user_id = current_user_id;
 
--- Boards Policy: Owners can do everything, others based on permissions (simplified for now to public/private or just owner)
--- For now, allow owners to do everything.
-CREATE POLICY "Owners can manage boards" ON public.boards USING (auth.uid() = owner_id);
+  IF user_access_level IS NULL THEN
+    RETURN false;
+  END IF;
+
+  IF required_level = 'view' THEN
+    RETURN true; -- Any access level can view
+  ELSIF required_level = 'edit' THEN
+    RETURN user_access_level IN ('edit', 'admin');
+  ELSIF required_level = 'admin' THEN
+    RETURN user_access_level = 'admin';
+  END IF;
+
+  RETURN false;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+
+-- BOARDS POLICIES
+CREATE POLICY "View boards" ON public.boards FOR SELECT USING (
+  auth.uid() = owner_id OR 
+  EXISTS (SELECT 1 FROM public.permissions WHERE resource_id = id AND resource_type = 'board' AND user_id = auth.uid())
+);
+
+CREATE POLICY "Create boards" ON public.boards FOR INSERT WITH CHECK (auth.role() = 'authenticated');
+
+CREATE POLICY "Update boards" ON public.boards FOR UPDATE USING (
+  auth.uid() = owner_id OR 
+  EXISTS (SELECT 1 FROM public.permissions WHERE resource_id = id AND resource_type = 'board' AND user_id = auth.uid() AND access_level IN ('edit', 'admin'))
+);
+
+CREATE POLICY "Delete boards" ON public.boards FOR DELETE USING (auth.uid() = owner_id);
+
+
+-- LISTS POLICIES (Inherit from Board)
+CREATE POLICY "View lists" ON public.lists FOR SELECT USING (
+  public.has_board_access(board_id, 'view')
+);
+
+CREATE POLICY "Manage lists" ON public.lists FOR ALL USING (
+  public.has_board_access(board_id, 'edit')
+);
+
+
+-- CARDS POLICIES (Inherit from List -> Board)
+CREATE POLICY "View cards" ON public.cards FOR SELECT USING (
+  EXISTS (
+    SELECT 1 FROM public.lists 
+    WHERE lists.id = list_id 
+    AND public.has_board_access(lists.board_id, 'view')
+  )
+);
+
+CREATE POLICY "Manage cards" ON public.cards FOR ALL USING (
+  EXISTS (
+    SELECT 1 FROM public.lists 
+    WHERE lists.id = list_id 
+    AND public.has_board_access(lists.board_id, 'edit')
+  )
+);
+
+
+-- PERMISSIONS POLICIES
+-- Only board owners or admins can manage permissions for that board
+CREATE POLICY "View permissions" ON public.permissions FOR SELECT USING (
+   EXISTS (SELECT 1 FROM public.boards WHERE id = resource_id AND (owner_id = auth.uid())) OR
+   user_id = auth.uid() -- Users can see their own permissions
+);
+
+CREATE POLICY "Manage permissions" ON public.permissions FOR ALL USING (
+   EXISTS (
+     SELECT 1 FROM public.boards 
+     WHERE id = resource_id 
+     AND owner_id = auth.uid() -- Only owner can manage permissions for now for simplicity
+   )
+);
+
+
+-- REVENUE LOGS POLICIES
+CREATE POLICY "View revenue" ON public.revenue_logs FOR SELECT USING (
+  EXISTS (
+    SELECT 1 FROM public.cards
+    JOIN public.lists ON cards.list_id = lists.id
+    WHERE cards.id = card_id
+    AND public.has_board_access(lists.board_id, 'view')
+  )
+);
+
+CREATE POLICY "Manage revenue" ON public.revenue_logs FOR ALL USING (
+  EXISTS (
+    SELECT 1 FROM public.cards
+    JOIN public.lists ON cards.list_id = lists.id
+    WHERE cards.id = card_id
+    AND public.has_board_access(lists.board_id, 'edit')
+  )
+);
+
+-- Enable Realtime for all relevant tables
+ALTER PUBLICATION supabase_realtime ADD TABLE public.boards;
+ALTER PUBLICATION supabase_realtime ADD TABLE public.lists;
+ALTER PUBLICATION supabase_realtime ADD TABLE public.cards;
 
 -- Trigger to handle new user signup
 CREATE OR REPLACE FUNCTION public.handle_new_user()

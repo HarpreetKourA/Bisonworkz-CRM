@@ -1,0 +1,85 @@
+.card {
+    background-color: white;
+    padding: 1.5rem;
+    border-radius: 0.75rem;
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    border: 1px solid #f3f4f6;
+    display: flex;
+    flex-direction: column;
+}
+
+.header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+}
+
+.title {
+    color: #6b7280;
+    font-size: 0.875rem;
+    font-weight: 500;
+}
+
+.iconWrapper {
+    padding: 0.5rem;
+    border-radius: 0.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.variantDefault {
+    background-color: #eff6ff;
+    color: #2563eb;
+}
+
+.variantSuccess {
+    background-color: #ecfdf5;
+    color: #059669;
+}
+
+.variantDanger {
+    background-color: #fef2f2;
+    color: #dc2626;
+}
+
+.variantWarning {
+    background-color: #fefce8;
+    color: #d97706;
+}
+
+.content {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+}
+
+.value {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #111827;
+    margin: 0;
+}
+
+.trend {
+    font-size: 0.75rem;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    margin-top: 0.25rem;
+}
+
+.trendPositive {
+    color: #059669;
+}
+
+.trendNegative {
+    color: #dc2626;
+}
+
+.trendLabel {
+    color: #9ca3af;
+    font-weight: 400;
+}

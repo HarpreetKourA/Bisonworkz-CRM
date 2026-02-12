@@ -42,7 +42,7 @@ export async function middleware(request: NextRequest) {
 
     // Redirect to dashboard (or boards) if accessing login/signup while authenticated
     if (user && (path === '/login' || path === '/signup')) {
-        return NextResponse.redirect(new URL('/', request.url)) // Or /boards later
+        return NextResponse.redirect(new URL('/boards', request.url))
     }
 
     return response

@@ -1,0 +1,20 @@
+.chartContainer {
+    height: 350px;
+    width: 100%;
+}
+
+.noData {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    color: #9ca3af;
+}
+
+.tooltip {
+    background-color: white;
+    padding: 0.5rem;
+    border: 1px solid #e5e7eb;
+    border-radius: 0.5rem;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}

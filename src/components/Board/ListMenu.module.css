@@ -1,0 +1,81 @@
+.menuContainer {
+    position: relative;
+    display: inline-block;
+}
+
+.menuButton {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 4px;
+    border-radius: 3px;
+    color: #6b778c;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.menuButton:hover {
+    background-color: rgba(9, 30, 66, 0.08);
+    color: #172b4d;
+}
+
+.menuDropdown {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    z-index: 10;
+    background: #fff;
+    border-radius: 3px;
+    box-shadow: 0 8px 16px -4px rgba(9, 30, 66, 0.25), 0 0 0 1px rgba(9, 30, 66, 0.08);
+    width: 200px;
+    padding: 4px 0;
+    margin-top: 4px;
+}
+
+.menuHeader {
+    text-align: center;
+    color: #5e6c84;
+    font-size: 14px;
+    font-weight: 600;
+    padding: 8px 12px;
+    border-bottom: 1px solid rgba(9, 30, 66, 0.13);
+    margin-bottom: 4px;
+    position: relative;
+}
+
+.closeMenu {
+    position: absolute;
+    top: 0;
+    right: 0;
+    padding: 8px 12px;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    color: #6b778c;
+}
+
+.menuItem {
+    display: block;
+    width: 100%;
+    text-align: left;
+    padding: 6px 12px;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    font-size: 14px;
+    color: #172b4d;
+}
+
+.menuItem:hover {
+    background-color: rgba(9, 30, 66, 0.08);
+}
+
+.danger {
+    color: #b04632;
+}
+
+.danger:hover {
+    background-color: #b04632;
+    color: #fff;
+}

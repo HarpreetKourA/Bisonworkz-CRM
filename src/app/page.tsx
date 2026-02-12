@@ -5,6 +5,19 @@ export default async function Home() {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
 
+  let role = 'user'
+
+  if (user) {
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('role')
+      .eq('id', user.id)
+      .single()
+    role = profile?.role || 'user'
+  }
+
+  const isAdmin = role === 'admin' || role === 'super_admin'
+
   return (
     <main className={styles.main}>
       <div className={styles.hero}>
@@ -14,6 +27,15 @@ export default async function Home() {
           {user ? (
             <>
               <a href="/boards" className="btn btn-primary">Go to Boards</a>
+
+              {isAdmin && (
+                <a href="/dashboard" className="btn" style={{ backgroundColor: '#fff', border: '1px solid #e2e8f0', color: '#0f172a' }}>Financial Dashboard</a>
+              )}
+
+              {isAdmin && (
+                <a href="/admin" className="btn btn-outline">Admin Panel</a>
+              )}
+
               <a href="/profile" className="btn btn-outline">Profile</a>
             </>
           ) : (
@@ -25,11 +47,10 @@ export default async function Home() {
         </div>
         {user && (
           <p style={{ marginTop: '1rem', fontSize: '0.875rem', color: 'var(--text-muted)' }}>
-            Logged in as {user.email}
+            Logged in as {user.email} <span style={{ opacity: 0.5 }}>({role.replace('_', ' ')})</span>
           </p>
         )}
       </div>
     </main>
   );
 }
-

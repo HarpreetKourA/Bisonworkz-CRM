@@ -1,0 +1,22 @@
+.card {
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 1px 1px rgba(9, 30, 66, 0.25), 0 0 0 1px rgba(9, 30, 66, 0.08);
+    color: #172b4d;
+    cursor: pointer;
+    display: block;
+    margin-bottom: 8px;
+    max-width: 300px;
+    min-height: 20px;
+    position: relative;
+    text-decoration: none;
+    z-index: 0;
+    padding: 8px 12px;
+    font-size: 14px;
+    word-wrap: break-word;
+}
+
+.card:hover {
+    background-color: #f8f9fa;
+    border-color: #091e4224;
+}

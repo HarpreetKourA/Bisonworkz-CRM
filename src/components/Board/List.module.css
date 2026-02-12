@@ -1,0 +1,89 @@
+.listWrapper {
+    width: 272px;
+    margin: 0 4px;
+    height: 100%;
+    box-sizing: border-box;
+    display: inline-block;
+    vertical-align: top;
+    white-space: nowrap;
+}
+
+.listContent {
+    background-color: #f1f2f4;
+    border-radius: 12px;
+    display: flex;
+    flex-direction: column;
+    max-height: 100%;
+    position: relative;
+    white-space: normal;
+    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
+}
+
+.listHeader {
+    padding: 10px 8px;
+    min-height: 20px;
+    position: relative;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.listTitle {
+    background: transparent;
+    border-radius: 3px;
+    box-shadow: none;
+    font-weight: 600;
+    margin: 0;
+    min-height: 20px;
+    padding: 4px 8px;
+    transition: background 85ms ease-in, border-color 85ms ease-in, box-shadow 85ms ease-in;
+    font-size: 14px;
+    color: #172b4d;
+}
+
+.cardContainer {
+    flex: 1 1 auto;
+    margin-bottom: 0;
+    overflow-y: auto;
+    overflow-x: hidden;
+    margin: 0 4px;
+    padding: 0 4px;
+    z-index: 1;
+    min-height: 20px;
+}
+
+/* Custom scrollbar for card container */
+.cardContainer::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+.cardContainer::-webkit-scrollbar-thumb {
+    background: #dcdfe4;
+    border-radius: 4px;
+}
+
+.listFooter {
+    padding: 10px 8px;
+}
+
+.addCardBtn {
+    background-color: transparent;
+    border-radius: 8px;
+    color: #44546f;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    padding: 6px 8px;
+    text-decoration: none;
+    user-select: none;
+    width: 100%;
+    border: none;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.addCardBtn:hover {
+    background-color: rgba(9, 30, 66, 0.08);
+    color: #172b4d;
+}
