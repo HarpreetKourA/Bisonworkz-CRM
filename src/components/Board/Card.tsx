@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import styles from './Card.module.css'
 import CardModal from './CardModal'
 import { Calendar } from 'lucide-react'
@@ -37,8 +37,14 @@ function getDueDateStatus(dueDateStr: string): 'overdue' | 'today' | 'upcoming' 
 
 export default function Card({ id, title, description, expense_summary, expense_credits, due_date, labels, listId, boardId }: CardProps) {
     const [isModalOpen, setIsModalOpen] = useState(false)
+    const [currentDueDate, setCurrentDueDate] = useState(due_date || '')
+    const [currentLabels, setCurrentLabels] = useState(labels || [])
 
-    const dueStatus = due_date ? getDueDateStatus(due_date) : 'none'
+    // Sync when server re-renders with fresh data
+    useEffect(() => { setCurrentDueDate(due_date || '') }, [due_date])
+    useEffect(() => { setCurrentLabels(labels || []) }, [labels])
+
+    const dueStatus = currentDueDate ? getDueDateStatus(currentDueDate) : 'none'
 
     return (
         <>
@@ -47,9 +53,9 @@ export default function Card({ id, title, description, expense_summary, expense_
                 onClick={() => setIsModalOpen(true)}
             >
                 {/* Label color strips */}
-                {labels && labels.length > 0 && (
+                {currentLabels && currentLabels.length > 0 && (
                     <div className={styles.labelStrips}>
-                        {labels.map(label => (
+                        {currentLabels.map(label => (
                             <div
                                 key={label.id}
                                 className={styles.labelStrip}
@@ -64,10 +70,10 @@ export default function Card({ id, title, description, expense_summary, expense_
 
                 <div className={styles.cardMeta}>
                     {/* Due date badge */}
-                    {due_date && (
+                    {currentDueDate && (
                         <span className={`${styles.dueBadge} ${styles[dueStatus]}`}>
                             <Calendar size={12} />
-                            {new Date(due_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                            {new Date(currentDueDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
                         </span>
                     )}
 
@@ -87,7 +93,9 @@ export default function Card({ id, title, description, expense_summary, expense_
                     listId={listId}
                     initialTitle={title}
                     initialDescription={description}
-                    initialDueDate={due_date}
+                    initialDueDate={currentDueDate}
+                    onDueDateChange={(d) => setCurrentDueDate(d)}
+                    onLabelsChange={(l) => setCurrentLabels(l)}
                     onClose={() => setIsModalOpen(false)}
                 />
             )}

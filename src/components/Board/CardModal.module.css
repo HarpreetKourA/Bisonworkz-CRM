@@ -24,7 +24,8 @@
     flex-direction: column;
     margin-bottom: 48px;
     position: relative;
-    width: 960px;
+    width: 1040px;
+    max-width: 95vw;
     z-index: 1001;
     min-height: 400px;
     padding: 24px;
@@ -321,20 +322,20 @@
 .mainContent {
     display: flex;
     flex-direction: row;
-    gap: 20px;
+    gap: 24px;
 }
 
 .mainCol {
-    flex: 4;
+    flex: 6;
     min-width: 0;
 }
 
-.sidebar {
-    width: 260px;
+.sideCol {
+    flex: 4;
     display: flex;
     flex-direction: column;
-    gap: 20px;
-    flex-shrink: 0;
+    gap: 16px;
+    min-width: 0;
 }
 
 .sidebarActions {
@@ -743,10 +744,9 @@
 
 /* Comments Sidebar */
 .commentsSection {
-    flex: 6;
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: 10px;
     min-width: 0;
 }
 
@@ -758,17 +758,17 @@
 
 .commentInputWrap {
     display: flex;
-    gap: 8px;
+    gap: 6px;
 }
 
 .commentInput {
     flex: 1;
-    padding: 8px 12px;
+    padding: 7px 10px;
     border: 1.5px solid var(--border);
     border-radius: var(--radius);
     background: var(--surface);
     color: var(--text);
-    font-size: var(--font-sm);
+    font-size: 13px;
     font-family: inherit;
     transition: all var(--transition);
 }
@@ -786,7 +786,7 @@
     border: none;
     border-radius: var(--radius);
     cursor: pointer;
-    padding: 8px 10px;
+    padding: 6px 8px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -805,94 +805,81 @@
 .commentsList {
     display: flex;
     flex-direction: column;
-    gap: 6px;
-    max-height: 300px;
+    gap: 2px;
+    max-height: 320px;
     overflow-y: auto;
+    padding-right: 4px;
 }
 
-/* Each comment row: avatar | bubble | actions */
 .commentItem {
     display: flex;
-    gap: 10px;
+    gap: 8px;
     align-items: flex-start;
-    padding: 6px 0;
+    padding: 5px 0;
 }
 
 .commentAvatar {
-    width: 28px;
-    height: 28px;
+    width: 26px;
+    height: 26px;
     border-radius: 50%;
     background: linear-gradient(135deg, var(--primary), var(--primary-hover));
     color: #fff;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 12px;
+    font-size: 11px;
     font-weight: 700;
     flex-shrink: 0;
     margin-top: 2px;
 }
 
-/* The bubble with name + content */
 .commentBody {
     flex: 1;
     min-width: 0;
     background: var(--surface-hover);
-    border-radius: 6px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
     padding: 6px 10px;
 }
 
 .commentMeta {
     display: flex;
     align-items: center;
-    gap: 8px;
-    margin-bottom: 2px;
+    gap: 6px;
+    margin-bottom: 1px;
 }
 
 .commentMeta strong {
     font-size: 11px;
     color: var(--foreground);
     font-weight: 600;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 180px;
 }
 
 .commentDate {
-    font-size: 11px;
+    font-size: 10px;
     color: var(--text-muted);
+    white-space: nowrap;
+    flex-shrink: 0;
 }
 
 .commentContent {
-    font-size: var(--font-sm);
+    font-size: 13px;
     color: var(--text);
-    line-height: 1.4;
+    line-height: 1.35;
     margin: 0;
     padding: 0;
     word-wrap: break-word;
 }
 
-/* Action buttons column */
 .commentActions {
     display: flex;
-    flex-direction: column;
     gap: 2px;
     flex-shrink: 0;
     margin-top: 4px;
-}
-
-.commentActionBtn {
-    background: none;
-    border: none;
-    color: var(--text-muted);
-    cursor: pointer;
-    padding: 4px;
-    border-radius: 4px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.15s;
-}
-
-.commentActionBtn:hover {
-    background: var(--surface-hover);
 }
 
 .commentDeleteBtn {
@@ -900,12 +887,17 @@
     border: none;
     color: var(--text-muted);
     cursor: pointer;
-    padding: 4px;
+    padding: 3px;
     border-radius: 4px;
     display: flex;
     align-items: center;
     justify-content: center;
     transition: all 0.15s;
+    opacity: 0.5;
+}
+
+.commentItem:hover .commentDeleteBtn {
+    opacity: 1;
 }
 
 .commentDeleteBtn:hover {

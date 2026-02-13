@@ -25,6 +25,8 @@ interface CardModalProps {
     initialTitle: string
     initialDescription?: string
     initialDueDate?: string
+    onDueDateChange?: (date: string) => void
+    onLabelsChange?: (labels: LabelType[]) => void
     onClose: () => void
 }
 
@@ -53,7 +55,7 @@ function getDueDateStatus(dueDateStr: string): 'overdue' | 'today' | 'upcoming' 
 }
 
 export default function CardModal({
-    cardId, boardId, listId, initialTitle, initialDescription, initialDueDate, onClose
+    cardId, boardId, listId, initialTitle, initialDescription, initialDueDate, onDueDateChange, onLabelsChange, onClose
 }: CardModalProps) {
     const [title, setTitle] = useState(initialTitle)
     const [description, setDescription] = useState(initialDescription || '')
@@ -190,6 +192,7 @@ export default function CardModal({
         setShowDatePicker(false)
         try {
             await updateCard(cardId, boardId, { due_date: date || null })
+            onDueDateChange?.(date)
         } catch (err: any) {
             console.error('Failed to update due date', err)
             alert('Failed to save due date: ' + (err?.message || 'Unknown error'))
@@ -203,6 +206,7 @@ export default function CardModal({
             await addLabel(cardId, boardId, color, text.trim())
             const updated = await getLabels(cardId)
             setLabels(updated)
+            onLabelsChange?.(updated)
             setLabelText('')
         } catch (error) {
             console.error('Failed to add label', error)
@@ -210,7 +214,9 @@ export default function CardModal({
     }
 
     const handleRemoveLabel = async (labelId: string) => {
-        setLabels(labels.filter(l => l.id !== labelId))
+        const updated = labels.filter(l => l.id !== labelId)
+        setLabels(updated)
+        onLabelsChange?.(updated)
         try {
             await removeLabel(labelId, boardId)
         } catch (error) {
@@ -635,8 +641,8 @@ export default function CardModal({
                         </div>
                     </div>
 
-                    {/* Right Sidebar */}
-                    <div className={styles.sidebar}>
+                    {/* Right Column — Comments + Actions */}
+                    <div className={styles.sideCol}>
                         <CommentsSection cardId={cardId} boardId={boardId} initialComments={comments} />
 
                         <div className={styles.sidebarActions}>

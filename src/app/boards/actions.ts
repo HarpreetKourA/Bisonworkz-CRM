@@ -91,6 +91,13 @@ export async function getCards(listId: string) {
         .order('position', { ascending: true })
 
     if (error) throw new Error(error.message)
+
+    // DEBUG: Log due_date values to trace persistence issue
+    if (cards && cards.length > 0) {
+        console.log('[getCards] Sample card keys:', Object.keys(cards[0]))
+        cards.forEach((c: any) => console.log(`[getCards] Card "${c.title}" due_date=${c.due_date}`))
+    }
+
     return cards
 }
 
