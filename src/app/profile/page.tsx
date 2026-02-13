@@ -14,9 +14,6 @@ export default async function ProfilePage() {
         redirect('/login')
     }
 
-    // Fetch profile data (metadata)
-    // Note: 'users' table usage here seems legacy or specific to this project's other parts. 
-    // We mainly need 'profiles' for the role.
     const { data: userMetadata } = await supabase
         .from('users')
         .select('*')
@@ -34,56 +31,47 @@ export default async function ProfilePage() {
     const email = user.email || ''
     const role = roleData?.role || 'user'
 
+    const badgeClass = role === 'super_admin' ? styles.roleBadgeSuperAdmin
+        : role === 'admin' ? styles.roleBadgeAdmin
+            : styles.roleBadgeUser
+
     return (
         <div className={styles.container}>
-            <div className="card" style={{ padding: '2rem', maxWidth: '600px', width: '100%' }}>
+            <div className={styles.profileCard}>
                 <div className={styles.header}>
                     <div>
-                        <h1 style={{ margin: 0 }}>Profile</h1>
-                        <span className={`badge ${role === 'super_admin' ? 'bg-purple-100 text-purple-800' :
-                            role === 'admin' ? 'bg-blue-100 text-blue-800' :
-                                'bg-gray-100 text-gray-800'
-                            }`} style={{
-                                fontSize: '0.75rem',
-                                padding: '0.25rem 0.5rem',
-                                borderRadius: '9999px',
-                                marginTop: '0.5rem',
-                                display: 'inline-block',
-                                textTransform: 'capitalize'
-                            }}>
+                        <h1>Profile</h1>
+                        <span className={`${styles.roleBadge} ${badgeClass}`}>
                             {role.replace('_', ' ')}
                         </span>
                     </div>
                     <form action={signOut}>
-                        <button className="btn btn-outline" style={{ fontSize: '0.875rem' }}>Sign Out</button>
+                        <button className="btn btn-outline">Sign Out</button>
                     </form>
                 </div>
 
-                <div className={styles.avatarPreview}>
-                    {avatarUrl ? (
-                        // eslint-disable-next-line @next/next/no-img-element
-                        <img src={avatarUrl} alt="Avatar" className={styles.avatarImage} />
-                    ) : (
-                        <div style={{
-                            width: '80px', height: '80px', borderRadius: '50%',
-                            backgroundColor: '#e5e7eb', display: 'flex',
-                            alignItems: 'center', justifyContent: 'center',
-                            fontSize: '2rem', color: '#6b7280', margin: '0 auto'
-                        }}>
-                            {fullName ? fullName.charAt(0).toUpperCase() : email.charAt(0).toUpperCase()}
-                        </div>
-                    )}
+                <div className={styles.avatarSection}>
+                    <div className={styles.avatarPreview}>
+                        {avatarUrl ? (
+                            // eslint-disable-next-line @next/next/no-img-element
+                            <img src={avatarUrl} alt="Avatar" className={styles.avatarImage} />
+                        ) : (
+                            <div className={styles.avatarInner}>
+                                {fullName ? fullName.charAt(0).toUpperCase() : email.charAt(0).toUpperCase()}
+                            </div>
+                        )}
+                    </div>
                 </div>
 
                 <form action={updateProfile} className={styles.form}>
                     <div className={styles.group}>
                         <label className={styles.label}>Role</label>
-                        <input type="text" value={role.replace('_', ' ').toUpperCase()} disabled className={styles.input} style={{ opacity: 0.7, cursor: 'not-allowed', fontWeight: 'bold' }} />
+                        <input type="text" value={role.replace('_', ' ').toUpperCase()} disabled className={styles.input} />
                     </div>
 
                     <div className={styles.group}>
                         <label className={styles.label}>Email</label>
-                        <input type="email" value={email} disabled className={styles.input} style={{ opacity: 0.7, cursor: 'not-allowed' }} />
+                        <input type="email" value={email} disabled className={styles.input} />
                     </div>
 
                     <div className={styles.group}>
@@ -108,18 +96,16 @@ export default async function ProfilePage() {
                             placeholder="https://example.com/avatar.jpg"
                             className={styles.input}
                         />
-                        <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
+                        <p className={styles.hint}>
                             Enter a direct link to an image for your avatar.
                         </p>
                     </div>
 
-                    <div style={{ display: 'flex', gap: '1rem', marginTop: '1rem' }}>
-                        <a href="/" className="btn btn-outline" style={{ flex: 1, textAlign: 'center', textDecoration: 'none' }}>Cancel</a>
-                        <button type="submit" className="btn btn-primary" style={{ flex: 1 }}>Save Changes</button>
+                    <div className={styles.actions}>
+                        <a href="/" className="btn btn-outline">Cancel</a>
+                        <button type="submit" className="btn btn-primary">Save Changes</button>
                     </div>
                 </form>
-
-
             </div>
         </div>
     )

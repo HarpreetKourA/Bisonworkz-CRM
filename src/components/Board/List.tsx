@@ -1,7 +1,7 @@
 
 import React from 'react'
 import styles from './List.module.css'
-import { getCards } from '@/app/boards/actions'
+import { getCards, getLabelsForCards } from '@/app/boards/actions'
 import Card from './Card'
 import CreateCard from './CreateCard'
 import ListMenu from './ListMenu'
@@ -14,6 +14,21 @@ interface ListProps {
 
 export default async function List({ id, title, boardId }: ListProps) {
     const cards = await getCards(id)
+
+    // Batch-fetch labels for all cards in this list
+    const cardIds = cards.map((c: any) => c.id)
+    let allLabels: any[] = []
+    try {
+        allLabels = await getLabelsForCards(cardIds)
+    } catch (e) { /* table might not exist yet */ }
+
+    // Group labels by card_id
+    const labelsByCard = new Map<string, any[]>()
+    allLabels.forEach((label: any) => {
+        const existing = labelsByCard.get(label.card_id) || []
+        existing.push(label)
+        labelsByCard.set(label.card_id, existing)
+    })
 
     return (
         <div className={styles.listWrapper}>
@@ -34,6 +49,8 @@ export default async function List({ id, title, boardId }: ListProps) {
                             boardId={boardId}
                             expense_summary={card.expense_summary}
                             expense_credits={card.expense_credits}
+                            due_date={card.due_date}
+                            labels={labelsByCard.get(card.id) || []}
                         />
                     ))}
                 </div>

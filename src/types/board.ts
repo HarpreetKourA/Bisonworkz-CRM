@@ -8,6 +8,7 @@ export interface CardType {
     payment_status?: 'pending' | 'paid' | 'overdue'
     expense_summary?: number
     expense_credits?: number
+    due_date?: string
 }
 
 export interface ListType {

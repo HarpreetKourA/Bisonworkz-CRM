@@ -22,32 +22,32 @@ export default async function Home() {
     <main className={styles.main}>
       <div className={styles.hero}>
         <h1>Bisonworkz CRM</h1>
-        <p>Project Management & Financial Tracking</p>
+        <p>Project Management &amp; Financial Tracking</p>
         <div className={styles.actions}>
           {user ? (
             <>
               <a href="/boards" className="btn btn-primary">Go to Boards</a>
 
               {isAdmin && (
-                <a href="/dashboard" className="btn" style={{ backgroundColor: '#fff', border: '1px solid #e2e8f0', color: '#0f172a' }}>Financial Dashboard</a>
+                <a href="/dashboard" className="btn btn-outline">Financial Dashboard</a>
               )}
 
               {isAdmin && (
                 <a href="/admin" className="btn btn-outline">Admin Panel</a>
               )}
 
-              <a href="/profile" className="btn btn-outline">Profile</a>
+              <a href="/profile" className="btn btn-ghost">Profile</a>
             </>
           ) : (
             <>
               <a href="/login" className="btn btn-primary">Login</a>
-              <a href="/signup" className="btn">Sign Up</a>
+              <a href="/signup" className="btn btn-outline">Sign Up</a>
             </>
           )}
         </div>
         {user && (
-          <p style={{ marginTop: '1rem', fontSize: '0.875rem', color: 'var(--text-muted)' }}>
-            Logged in as {user.email} <span style={{ opacity: 0.5 }}>({role.replace('_', ' ')})</span>
+          <p className={styles.userInfo}>
+            Logged in as {user.email} <span>({role.replace('_', ' ')})</span>
           </p>
         )}
       </div>

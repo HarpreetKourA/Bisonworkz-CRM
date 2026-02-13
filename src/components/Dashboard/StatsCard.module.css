@@ -1,11 +1,17 @@
 .card {
-    background-color: white;
+    background: var(--surface);
     padding: 1.5rem;
-    border-radius: 0.75rem;
-    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-    border: 1px solid #f3f4f6;
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+    border: 1px solid var(--border);
     display: flex;
     flex-direction: column;
+    transition: all var(--transition);
+}
+
+.card:hover {
+    box-shadow: var(--shadow);
+    transform: translateY(-2px);
 }
 
 .header {
@@ -16,36 +22,38 @@
 }
 
 .title {
-    color: #6b7280;
-    font-size: 0.875rem;
-    font-weight: 500;
+    color: var(--text-muted);
+    font-size: 0.8125rem;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
 }
 
 .iconWrapper {
     padding: 0.5rem;
-    border-radius: 0.5rem;
+    border-radius: var(--radius);
     display: flex;
     align-items: center;
     justify-content: center;
 }
 
 .variantDefault {
-    background-color: #eff6ff;
+    background: linear-gradient(135deg, #eff6ff, #dbeafe);
     color: #2563eb;
 }
 
 .variantSuccess {
-    background-color: #ecfdf5;
+    background: linear-gradient(135deg, #ecfdf5, #d1fae5);
     color: #059669;
 }
 
 .variantDanger {
-    background-color: #fef2f2;
+    background: linear-gradient(135deg, #fef2f2, #fee2e2);
     color: #dc2626;
 }
 
 .variantWarning {
-    background-color: #fefce8;
+    background: linear-gradient(135deg, #fefce8, #fef3c7);
     color: #d97706;
 }
 
@@ -56,15 +64,17 @@
 }
 
 .value {
-    font-size: 1.5rem;
-    font-weight: 700;
-    color: #111827;
+    font-size: 1.75rem;
+    font-weight: 800;
+    color: var(--foreground);
     margin: 0;
+    letter-spacing: -0.02em;
+    font-variant-numeric: tabular-nums;
 }
 
 .trend {
     font-size: 0.75rem;
-    font-weight: 500;
+    font-weight: 600;
     display: flex;
     align-items: center;
     gap: 0.25rem;
@@ -72,14 +82,14 @@
 }
 
 .trendPositive {
-    color: #059669;
+    color: var(--success);
 }
 
 .trendNegative {
-    color: #dc2626;
+    color: var(--danger);
 }
 
 .trendLabel {
-    color: #9ca3af;
+    color: var(--text-muted);
     font-weight: 400;
 }

@@ -8,16 +8,17 @@
     border: none;
     cursor: pointer;
     padding: 4px;
-    border-radius: 3px;
-    color: #6b778c;
+    border-radius: var(--radius-sm);
+    color: var(--text-muted);
     display: flex;
     align-items: center;
     justify-content: center;
+    transition: all var(--transition);
 }
 
 .menuButton:hover {
-    background-color: rgba(9, 30, 66, 0.08);
-    color: #172b4d;
+    background: var(--surface-hover);
+    color: var(--foreground);
 }
 
 .menuDropdown {
@@ -25,21 +26,23 @@
     top: 100%;
     left: 0;
     z-index: 10;
-    background: #fff;
-    border-radius: 3px;
-    box-shadow: 0 8px 16px -4px rgba(9, 30, 66, 0.25), 0 0 0 1px rgba(9, 30, 66, 0.08);
+    background: var(--surface);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-lg);
+    border: 1px solid var(--border);
     width: 200px;
     padding: 4px 0;
     margin-top: 4px;
+    animation: scaleIn 0.15s ease-out;
 }
 
 .menuHeader {
     text-align: center;
-    color: #5e6c84;
-    font-size: 14px;
-    font-weight: 600;
+    color: var(--text-muted);
+    font-size: 0.8125rem;
+    font-weight: 700;
     padding: 8px 12px;
-    border-bottom: 1px solid rgba(9, 30, 66, 0.13);
+    border-bottom: 1px solid var(--border);
     margin-bottom: 4px;
     position: relative;
 }
@@ -52,30 +55,39 @@
     background: transparent;
     border: none;
     cursor: pointer;
-    color: #6b778c;
+    color: var(--text-muted);
+    transition: color var(--transition);
+}
+
+.closeMenu:hover {
+    color: var(--foreground);
 }
 
 .menuItem {
     display: block;
     width: 100%;
     text-align: left;
-    padding: 6px 12px;
+    padding: 8px 14px;
     background: transparent;
     border: none;
     cursor: pointer;
-    font-size: 14px;
-    color: #172b4d;
+    font-size: 0.8125rem;
+    font-weight: 500;
+    color: var(--text);
+    transition: all var(--transition);
+    border-radius: 0;
 }
 
 .menuItem:hover {
-    background-color: rgba(9, 30, 66, 0.08);
+    background: var(--surface-hover);
+    color: var(--foreground);
 }
 
 .danger {
-    color: #b04632;
+    color: var(--danger);
 }
 
 .danger:hover {
-    background-color: #b04632;
-    color: #fff;
+    background: var(--danger);
+    color: white;
 }

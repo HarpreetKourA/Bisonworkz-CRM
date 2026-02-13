@@ -3,6 +3,13 @@
 import React, { useState } from 'react'
 import styles from './Card.module.css'
 import CardModal from './CardModal'
+import { Calendar } from 'lucide-react'
+
+interface LabelData {
+    id: string
+    color: string
+    text?: string
+}
 
 interface CardProps {
     id: string
@@ -12,10 +19,26 @@ interface CardProps {
     boardId: string
     expense_summary?: number
     expense_credits?: number
+    due_date?: string
+    labels?: LabelData[]
 }
 
-export default function Card({ id, title, description, expense_summary, expense_credits, listId, boardId }: CardProps) {
+function getDueDateStatus(dueDateStr: string): 'overdue' | 'today' | 'upcoming' | 'none' {
+    if (!dueDateStr) return 'none'
+    const now = new Date()
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate())
+    const due = new Date(dueDateStr)
+    const dueDay = new Date(due.getFullYear(), due.getMonth(), due.getDate())
+
+    if (dueDay < today) return 'overdue'
+    if (dueDay.getTime() === today.getTime()) return 'today'
+    return 'upcoming'
+}
+
+export default function Card({ id, title, description, expense_summary, expense_credits, due_date, labels, listId, boardId }: CardProps) {
     const [isModalOpen, setIsModalOpen] = useState(false)
+
+    const dueStatus = due_date ? getDueDateStatus(due_date) : 'none'
 
     return (
         <>
@@ -23,31 +46,38 @@ export default function Card({ id, title, description, expense_summary, expense_
                 className={styles.card}
                 onClick={() => setIsModalOpen(true)}
             >
-                <div style={{ marginBottom: 4 }}>{title}</div>
-                {((expense_summary !== undefined && expense_summary !== 0) || true) && (
-                    <div style={{ display: 'flex', gap: 8, fontSize: 11, color: '#5e6c84', flexWrap: 'wrap' }}>
-                        {expense_summary !== undefined && expense_summary !== 0 && (
-                            <span style={{
-                                backgroundColor: expense_summary > 0 ? '#e6fffa' : '#fff5f5',
-                                color: expense_summary > 0 ? '#006644' : '#c53030',
-                                padding: '2px 4px',
-                                borderRadius: 3,
-                                fontWeight: 600
-                            }}>
-                                {expense_summary > 0 ? '+' : '-'} ₹ {Math.abs(expense_summary).toLocaleString()}
-                            </span>
-                        )}
-                        <span style={{
-                            backgroundColor: '#ebecf0',
-                            color: '#172b4d',
-                            padding: '2px 4px',
-                            borderRadius: 3,
-                            fontWeight: 500
-                        }}>
-                            Value: ₹ {(expense_credits || 0).toLocaleString()}
-                        </span>
+                {/* Label color strips */}
+                {labels && labels.length > 0 && (
+                    <div className={styles.labelStrips}>
+                        {labels.map(label => (
+                            <div
+                                key={label.id}
+                                className={styles.labelStrip}
+                                style={{ backgroundColor: label.color }}
+                                title={label.text || ''}
+                            />
+                        ))}
                     </div>
                 )}
+
+                <div className={styles.cardTitle}>{title}</div>
+
+                <div className={styles.cardMeta}>
+                    {/* Due date badge */}
+                    {due_date && (
+                        <span className={`${styles.dueBadge} ${styles[dueStatus]}`}>
+                            <Calendar size={12} />
+                            {new Date(due_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                        </span>
+                    )}
+
+                    {/* Expense summary */}
+                    {expense_summary !== undefined && expense_summary !== 0 && (
+                        <span className={expense_summary > 0 ? styles.creditBadge : styles.debitBadge}>
+                            {expense_summary > 0 ? '+' : '-'} ₹{Math.abs(expense_summary).toLocaleString()}
+                        </span>
+                    )}
+                </div>
             </div>
 
             {isModalOpen && (
@@ -57,6 +87,7 @@ export default function Card({ id, title, description, expense_summary, expense_
                     listId={listId}
                     initialTitle={title}
                     initialDescription={description}
+                    initialDueDate={due_date}
                     onClose={() => setIsModalOpen(false)}
                 />
             )}
