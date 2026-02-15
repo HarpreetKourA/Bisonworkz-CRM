@@ -16,6 +16,7 @@ interface CardProps {
     title: string
     description?: string
     listId: string
+    listName: string
     boardId: string
     expense_summary?: number
     expense_credits?: number
@@ -35,7 +36,7 @@ function getDueDateStatus(dueDateStr: string): 'overdue' | 'today' | 'upcoming' 
     return 'upcoming'
 }
 
-export default function Card({ id, title, description, expense_summary, expense_credits, due_date, labels, listId, boardId }: CardProps) {
+export default function Card({ id, title, description, expense_summary, expense_credits, due_date, labels, listId, listName, boardId }: CardProps) {
     const [isModalOpen, setIsModalOpen] = useState(false)
     const [currentDueDate, setCurrentDueDate] = useState(due_date || '')
     const [currentLabels, setCurrentLabels] = useState(labels || [])
@@ -91,6 +92,7 @@ export default function Card({ id, title, description, expense_summary, expense_
                     cardId={id}
                     boardId={boardId}
                     listId={listId}
+                    listName={listName}
                     initialTitle={title}
                     initialDescription={description}
                     initialDueDate={currentDueDate}

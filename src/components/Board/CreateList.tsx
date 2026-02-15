@@ -55,7 +55,7 @@ export default function CreateList({ boardId }: { boardId: string }) {
                         autoFocus
                         placeholder="Enter list title..."
                         className="input"
-                        style={{ marginBottom: '8px', background: 'white' }}
+                        style={{ marginBottom: '8px', background: 'white', color: 'black' }}
                         value={title}
                         onChange={(e) => setTitle(e.target.value)}
                     />

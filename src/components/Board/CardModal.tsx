@@ -17,11 +17,18 @@ import { ExpenseType } from '@/types/expense'
 import { LabelType, ChecklistItemType, CardMemberType, CommentType } from '@/types/card-features'
 import ChecklistSection from './ChecklistSection'
 import CommentsSection from './CommentsSection'
+import dynamic from 'next/dynamic'
+
+const RichTextEditor = dynamic(() => import('../RichTextEditor/RichTextEditor'), {
+    ssr: false,
+    loading: () => <p className={styles.placeholderText}>Loading editor...</p>
+})
 
 interface CardModalProps {
     cardId: string
     boardId: string
     listId: string
+    listName: string
     initialTitle: string
     initialDescription?: string
     initialDueDate?: string
@@ -55,7 +62,7 @@ function getDueDateStatus(dueDateStr: string): 'overdue' | 'today' | 'upcoming' 
 }
 
 export default function CardModal({
-    cardId, boardId, listId, initialTitle, initialDescription, initialDueDate, onDueDateChange, onLabelsChange, onClose
+    cardId, boardId, listId, listName, initialTitle, initialDescription, initialDueDate, onDueDateChange, onLabelsChange, onClose
 }: CardModalProps) {
     const [title, setTitle] = useState(initialTitle)
     const [description, setDescription] = useState(initialDescription || '')
@@ -328,27 +335,11 @@ export default function CardModal({
                     <X size={20} />
                 </button>
 
-                {/* Title & Ledger Dashboard */}
+                {/* Header Section */}
                 <div className={styles.header}>
-                    <div className={styles.ledgerDashboard}>
-                        <div className={styles.ledgerBox}>
-                            <div className={styles.ledgerLabel}>Summary</div>
-                            <div className={`${styles.ledgerValue} ${styles.summaryVal}`}>
-                                ₹ {summary.total.toLocaleString()}
-                            </div>
-                        </div>
-                        <div className={styles.ledgerBox}>
-                            <div className={styles.ledgerLabel}>Credit</div>
-                            <div className={`${styles.ledgerValue} ${styles.creditVal}`}>
-                                ₹ {summary.credit.toLocaleString()}
-                            </div>
-                        </div>
-                        <div className={styles.ledgerBox}>
-                            <div className={styles.ledgerLabel}>Debit</div>
-                            <div className={`${styles.ledgerValue} ${styles.debitVal}`}>
-                                ₹ {summary.debit.toLocaleString()}
-                            </div>
-                        </div>
+                    <div className={styles.breadcrumb}>
+                        <CreditCard size={16} />
+                        <span>{listName}</span>
                     </div>
 
                     <textarea
@@ -360,6 +351,28 @@ export default function CardModal({
                         rows={1}
                         spellCheck={false}
                     />
+
+                    {/* Quick Actions Row */}
+                    <div className={styles.quickActionsRow}>
+                        <button className={styles.actionPill} onClick={() => setIsAddingExpense(!isAddingExpense)}>
+                            <Plus size={14} /> Add
+                        </button>
+                        <button className={styles.actionPill} onClick={() => setShowLabelPicker(!showLabelPicker)}>
+                            <Tag size={14} /> Labels
+                        </button>
+                        <button className={styles.actionPill} onClick={() => { setShowChecklist(!showChecklist) }}>
+                            <CheckSquare size={14} /> Checklist
+                        </button>
+                        <button className={styles.actionPill} onClick={handleShowMembers}>
+                            <Users size={14} /> Members
+                        </button>
+                        <button className={styles.actionPill} onClick={() => setShowDatePicker(!showDatePicker)}>
+                            <Clock size={14} /> Dates
+                        </button>
+                        <button className={styles.actionPill} onClick={() => alert('Attachment feature coming soon')}>
+                            <span style={{ transform: 'rotate(45deg)' }}>📎</span> Attachment
+                        </button>
+                    </div>
 
                     {/* Labels Display */}
                     {labels.length > 0 && (
@@ -378,148 +391,6 @@ export default function CardModal({
                         </div>
                     )}
 
-                    {/* Quick Action Bar */}
-                    <div className={styles.actionBar}>
-                        <button className={styles.actionBarBtn} onClick={() => setIsAddingExpense(!isAddingExpense)}>
-                            <Plus size={14} /> Add
-                        </button>
-                        <button className={styles.actionBarBtn} onClick={() => setShowLabelPicker(!showLabelPicker)}>
-                            <Tag size={14} /> Labels
-                        </button>
-                        <button className={styles.actionBarBtn} onClick={() => setShowDatePicker(!showDatePicker)}>
-                            <Clock size={14} /> Dates
-                        </button>
-                        <button className={styles.actionBarBtn} onClick={() => { setShowChecklist(!showChecklist) }}>
-                            <CheckSquare size={14} /> Checklist
-                        </button>
-                        <button className={styles.actionBarBtn} onClick={handleShowMembers}>
-                            <Users size={14} /> Members
-                        </button>
-                    </div>
-
-                    {/* Label Picker Popover */}
-                    {showLabelPicker && (
-                        <div className={styles.popover}>
-                            <div className={styles.popoverHeader}>
-                                <span>Labels</span>
-                                <button className={styles.popoverClose} onClick={() => setShowLabelPicker(false)}>
-                                    <X size={16} />
-                                </button>
-                            </div>
-                            <input
-                                type="text"
-                                className={styles.formInput}
-                                placeholder="Label name (e.g. Urgent, In Progress)"
-                                value={labelText}
-                                onChange={(e) => setLabelText(e.target.value)}
-                                onKeyDown={(e) => { if (e.key === 'Enter' && labelText.trim()) handleAddLabel(selectedLabelColor, labelText) }}
-                                style={{ marginBottom: 10 }}
-                            />
-                            <div className={styles.colorGrid}>
-                                {LABEL_COLORS.map(lc => (
-                                    <button
-                                        key={lc.color}
-                                        className={`${styles.colorSwatch} ${selectedLabelColor === lc.color ? styles.colorSwatchActive : ''}`}
-                                        style={{ backgroundColor: lc.color }}
-                                        onClick={() => setSelectedLabelColor(lc.color)}
-                                        title={lc.name}
-                                    />
-                                ))}
-                            </div>
-                            <button
-                                className={styles.saveButton}
-                                onClick={() => handleAddLabel(selectedLabelColor, labelText)}
-                                disabled={!labelText.trim()}
-                                style={{ marginTop: 10, width: '100%' }}
-                            >
-                                Add Label
-                            </button>
-                        </div>
-                    )}
-
-                    {/* Date Picker Popover */}
-                    {showDatePicker && (
-                        <div className={styles.popover}>
-                            <div className={styles.popoverHeader}>
-                                <span>Due Date</span>
-                                <button className={styles.popoverClose} onClick={() => setShowDatePicker(false)}>
-                                    <X size={16} />
-                                </button>
-                            </div>
-                            <input
-                                type="date"
-                                className={styles.formInput}
-                                value={dueDate ? dueDate.split('T')[0] : ''}
-                                onChange={(e) => saveDueDate(e.target.value)}
-                            />
-                            {dueDate && (
-                                <button className={styles.cancelButton} onClick={() => saveDueDate('')}>
-                                    Remove date
-                                </button>
-                            )}
-                        </div>
-                    )}
-
-                    {/* Member Picker Popover */}
-                    {showMemberPicker && (
-                        <div className={styles.popover}>
-                            <div className={styles.popoverHeader}>
-                                <span>Members</span>
-                                <button className={styles.popoverClose} onClick={() => setShowMemberPicker(false)}>
-                                    <X size={16} />
-                                </button>
-                            </div>
-                            <div className={styles.memberList}>
-                                {allUsers.map(user => {
-                                    const isAssigned = members.some(m => m.user_id === user.id)
-                                    return (
-                                        <div key={user.id} className={styles.memberOption}>
-                                            <div className={styles.memberAvatar}>
-                                                {(user.email || 'U').charAt(0).toUpperCase()}
-                                            </div>
-                                            <span className={styles.memberEmail}>{user.email}</span>
-                                            {isAssigned ? (
-                                                <button
-                                                    className={styles.memberRemoveBtn}
-                                                    onClick={() => {
-                                                        const mem = members.find(m => m.user_id === user.id)
-                                                        if (mem) handleRemoveMember(mem.id)
-                                                    }}
-                                                >✕</button>
-                                            ) : (
-                                                <button
-                                                    className={styles.memberAddBtn}
-                                                    onClick={() => handleAddMember(user.id)}
-                                                >+</button>
-                                            )}
-                                        </div>
-                                    )
-                                })}
-                            </div>
-                        </div>
-                    )}
-
-                    {/* Due Date Display */}
-                    {dueDate && (() => {
-                        const status = getDueDateStatus(dueDate)
-                        const statusStyles: Record<string, React.CSSProperties> = {
-                            overdue: { background: '#fee2e2', color: '#991b1b', fontWeight: 600 },
-                            today: { background: '#fef3c7', color: '#92400e', fontWeight: 600 },
-                            upcoming: { background: 'var(--surface-hover)', color: 'var(--text)' },
-                            none: {},
-                        }
-                        const statusLabel = status === 'overdue' ? ' — Overdue!' : status === 'today' ? ' — Due Today' : ''
-                        return (
-                            <div className={styles.dueDateDisplay} style={statusStyles[status]}>
-                                <Calendar size={14} />
-                                <span>
-                                    {new Date(dueDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
-                                    {statusLabel && <strong>{statusLabel}</strong>}
-                                </span>
-                            </div>
-                        )
-                    })()}
-
                     {/* Members Display */}
                     {members.length > 0 && (
                         <div className={styles.membersDisplay}>
@@ -532,8 +403,138 @@ export default function CardModal({
                     )}
                 </div>
 
+                {/* Popovers (Keep existing logic but ensure positioning context works) */}
+                {/* Label Picker Popover */}
+                {showLabelPicker && (
+                    <div className={styles.popover} style={{ top: 120, left: 24 }}>
+                        <div className={styles.popoverHeader}>
+                            <span>Labels</span>
+                            <button className={styles.popoverClose} onClick={() => setShowLabelPicker(false)}>
+                                <X size={16} />
+                            </button>
+                        </div>
+                        <input
+                            type="text"
+                            className={styles.formInput}
+                            placeholder="Label name..."
+                            value={labelText}
+                            onChange={(e) => setLabelText(e.target.value)}
+                            onKeyDown={(e) => { if (e.key === 'Enter' && labelText.trim()) handleAddLabel(selectedLabelColor, labelText) }}
+                            style={{ marginBottom: 10 }}
+                        />
+                        <div className={styles.colorGrid}>
+                            {LABEL_COLORS.map(lc => (
+                                <button
+                                    key={lc.color}
+                                    className={`${styles.colorSwatch} ${selectedLabelColor === lc.color ? styles.colorSwatchActive : ''}`}
+                                    style={{ backgroundColor: lc.color }}
+                                    onClick={() => setSelectedLabelColor(lc.color)}
+                                    title={lc.name}
+                                />
+                            ))}
+                        </div>
+                        <button
+                            className={styles.saveButton}
+                            onClick={() => handleAddLabel(selectedLabelColor, labelText)}
+                            disabled={!labelText.trim()}
+                            style={{ marginTop: 10, width: '100%' }}
+                        >
+                            Add Label
+                        </button>
+                    </div>
+                )}
+
+                {/* Date Picker Popover */}
+                {showDatePicker && (
+                    <div className={styles.popover} style={{ top: 120, left: 200 }}>
+                        <div className={styles.popoverHeader}>
+                            <span>Due Date</span>
+                            <button className={styles.popoverClose} onClick={() => setShowDatePicker(false)}>
+                                <X size={16} />
+                            </button>
+                        </div>
+                        <input
+                            type="date"
+                            className={styles.formInput}
+                            value={dueDate ? dueDate.split('T')[0] : ''}
+                            onChange={(e) => saveDueDate(e.target.value)}
+                        />
+                        {dueDate && (
+                            <button className={styles.cancelButton} onClick={() => saveDueDate('')}>
+                                Remove date
+                            </button>
+                        )}
+                    </div>
+                )}
+
+                {/* Member Picker Popover */}
+                {showMemberPicker && (
+                    <div className={styles.popover} style={{ top: 120, left: 150 }}>
+                        <div className={styles.popoverHeader}>
+                            <span>Members</span>
+                            <button className={styles.popoverClose} onClick={() => setShowMemberPicker(false)}>
+                                <X size={16} />
+                            </button>
+                        </div>
+                        <div className={styles.memberList}>
+                            {allUsers.map(user => {
+                                const isAssigned = members.some(m => m.user_id === user.id)
+                                return (
+                                    <div key={user.id} className={styles.memberOption}>
+                                        <div className={styles.memberAvatar}>
+                                            {(user.email || 'U').charAt(0).toUpperCase()}
+                                        </div>
+                                        <span className={styles.memberEmail}>{user.email}</span>
+                                        {isAssigned ? (
+                                            <button
+                                                className={styles.memberRemoveBtn}
+                                                onClick={() => {
+                                                    const mem = members.find(m => m.user_id === user.id)
+                                                    if (mem) handleRemoveMember(mem.id)
+                                                }}
+                                            >✕</button>
+                                        ) : (
+                                            <button
+                                                className={styles.memberAddBtn}
+                                                onClick={() => handleAddMember(user.id)}
+                                            >+</button>
+                                        )}
+                                    </div>
+                                )
+                            })}
+                        </div>
+                    </div>
+                )}
+
                 <div className={styles.mainContent}>
+                    {/* LEFT COLUMN */}
                     <div className={styles.mainCol}>
+
+                        {/* Due Date Display */}
+                        {dueDate && (() => {
+                            const status = getDueDateStatus(dueDate)
+                            const statusStyles: Record<string, React.CSSProperties> = {
+                                overdue: { background: '#5c2b29', color: '#ff8f73', border: '1px solid #ff8f73' },
+                                today: { background: '#543b18', color: '#f5d884', border: '1px solid #f5d884' },
+                                upcoming: { background: 'var(--surface-hover)', color: 'var(--text)' },
+                                none: {},
+                            }
+                            const statusLabel = status === 'overdue' ? 'Overdue' : status === 'today' ? 'Due Today' : ''
+                            return (
+                                <div className={styles.section} style={{ marginBottom: 24 }}>
+                                    <h3 className={styles.sectionTitle} style={{ marginBottom: 8 }}>Due date</h3>
+                                    <div className={styles.dueDateBadge} style={{ ...statusStyles[status], display: 'inline-flex', alignItems: 'center', gap: 8, padding: '4px 8px', borderRadius: 3 }}>
+                                        <CheckSquare size={16} />
+                                        <span>
+                                            {new Date(dueDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: 'numeric' })}
+                                        </span>
+                                        {statusLabel && <span style={{ background: statusStyles[status].color as string, color: statusStyles[status].background as string, padding: '0 4px', borderRadius: 2, fontSize: 11, fontWeight: 700, textTransform: 'uppercase' }}>{statusLabel}</span>}
+                                        <button style={{ background: 'none', border: 'none', color: 'inherit', marginLeft: 4, cursor: 'pointer' }} onClick={() => setShowDatePicker(true)}>v</button>
+                                    </div>
+                                </div>
+                            )
+                        })()}
+
                         {/* Description Section */}
                         <div className={styles.section}>
                             <div className={styles.sectionHeader}>
@@ -541,22 +542,36 @@ export default function CardModal({
                                 <h3 className={styles.sectionTitle}>Description</h3>
                             </div>
                             {isEditingDesc ? (
-                                <div>
-                                    <textarea
-                                        className={styles.descriptionInput}
-                                        value={description}
-                                        onChange={(e) => setDescription(e.target.value)}
+                                <div className={styles.richTextEditorContainer}>
+                                    <RichTextEditor
+                                        content={description}
+                                        onChange={setDescription}
+                                        editable={true}
                                         placeholder="Add a more detailed description..."
-                                        autoFocus
                                     />
                                     <div className={styles.actions}>
                                         <button className={styles.saveButton} onClick={saveDescription} disabled={isLoading}>Save</button>
                                         <button className={styles.cancelButton} onClick={() => { setDescription(initialDescription || ''); setIsEditingDesc(false) }}>Cancel</button>
+                                        <div style={{ flex: 1 }}></div>
+                                        <button className={styles.cancelButton}>Formatting help</button>
                                     </div>
                                 </div>
                             ) : (
-                                <div className={styles.descriptionInput} style={{ minHeight: description ? 'auto' : 40, cursor: 'pointer' }} onClick={() => setIsEditingDesc(true)}>
-                                    {description || "Add a more detailed description..."}
+                                <div
+                                    className={styles.descriptionDisplay}
+                                    onClick={() => setIsEditingDesc(true)}
+                                    title="Click to edit"
+                                >
+                                    {description ? (
+                                        <div
+                                            className="tiptap-content"
+                                            dangerouslySetInnerHTML={{ __html: description }}
+                                        />
+                                    ) : (
+                                        <div className={styles.placeholderText}>
+                                            Add a more detailed description...
+                                        </div>
+                                    )}
                                 </div>
                             )}
                         </div>
@@ -566,17 +581,34 @@ export default function CardModal({
                             <ChecklistSection cardId={cardId} boardId={boardId} initialItems={checklistItems} />
                         )}
 
-                        {/* Expenses Section */}
+                        {/* Expenses (Ledger) Section - Kept here for functionality */}
                         <div className={styles.section}>
                             <div className={styles.sectionHeader} style={{ justifyContent: 'space-between' }}>
                                 <div style={{ display: 'flex', alignItems: 'center' }}>
                                     <CreditCard size={20} className={styles.icon} />
                                     <h3 className={styles.sectionTitle}>Expenses</h3>
                                 </div>
-                                <button className={styles.sidebarButton} style={{ width: 'auto', marginBottom: 0 }} onClick={() => setIsAddingExpense(!isAddingExpense)}>
-                                    {isAddingExpense ? 'Cancel' : 'Add Expense'}
-                                </button>
                             </div>
+
+                            {/* Ledger Summary */}
+                            <div className={styles.ledgerDashboard}>
+                                <div className={styles.ledgerBox}>
+                                    <div className={styles.ledgerLabel}>Summary</div>
+                                    <div className={`${styles.ledgerValue} ${styles.summaryVal}`}>₹ {summary.total.toLocaleString()}</div>
+                                </div>
+                                <div className={styles.ledgerBox}>
+                                    <div className={styles.ledgerLabel}>Credit</div>
+                                    <div className={`${styles.ledgerValue} ${styles.creditVal}`}>₹ {summary.credit.toLocaleString()}</div>
+                                </div>
+                                <div className={styles.ledgerBox}>
+                                    <div className={styles.ledgerLabel}>Debit</div>
+                                    <div className={`${styles.ledgerValue} ${styles.debitVal}`}>₹ {summary.debit.toLocaleString()}</div>
+                                </div>
+                            </div>
+
+                            <button className={styles.sidebarButton} style={{ width: 'auto', marginBottom: 12 }} onClick={() => setIsAddingExpense(!isAddingExpense)}>
+                                {isAddingExpense ? 'Cancel' : 'Add Expense'}
+                            </button>
 
                             {isAddingExpense && (
                                 <div className={styles.addExpenseForm}>
@@ -596,24 +628,14 @@ export default function CardModal({
                             )}
 
                             <div className={styles.expenseList}>
-                                {expenses.length > 0 && (
-                                    <div className={styles.expenseHeader}>
-                                        <span>Title</span>
-                                        <span>Amount</span>
-                                    </div>
-                                )}
                                 {expenses.map(exp => (
                                     <div key={exp.id} className={styles.expenseItem}>
                                         {editingExpenseId === exp.id ? (
                                             <div style={{ display: 'flex', gap: 8, width: '100%', alignItems: 'center' }}>
                                                 <input className={styles.formInput} value={editFormData.title} onChange={e => setEditFormData({ ...editFormData, title: e.target.value })} style={{ flex: 2 }} />
                                                 <input className={styles.formInput} type="number" value={editFormData.amount} onChange={e => setEditFormData({ ...editFormData, amount: e.target.value })} style={{ width: 80 }} />
-                                                <select className={styles.formInput} value={editFormData.type} onChange={e => setEditFormData({ ...editFormData, type: e.target.value as any })} style={{ width: 90 }}>
-                                                    <option value="credit">Cr (+)</option>
-                                                    <option value="debit">Dr (-)</option>
-                                                </select>
-                                                <button onClick={saveEditedExpense} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--success)' }}><Save size={16} /></button>
-                                                <button onClick={cancelEditing} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-muted)' }}><XCircle size={16} /></button>
+                                                <button onClick={saveEditedExpense}><Save size={16} /></button>
+                                                <button onClick={cancelEditing}><XCircle size={16} /></button>
                                             </div>
                                         ) : (
                                             <>
@@ -625,34 +647,28 @@ export default function CardModal({
                                                     <div className={`${styles.expenseAmount} ${exp.type === 'credit' ? styles.amountCredit : styles.amountDebit}`}>
                                                         {exp.type === 'credit' ? '+' : '-'} ₹ {exp.amount.toLocaleString()}
                                                     </div>
-                                                    <button style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-muted)' }} onClick={() => startEditing(exp)}><Edit2 size={14} /></button>
-                                                    <button style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-muted)' }} onClick={() => handleDeleteExpense(exp.id)}><Trash2 size={14} /></button>
+                                                    <button onClick={() => startEditing(exp)}><Edit2 size={14} /></button>
+                                                    <button onClick={() => handleDeleteExpense(exp.id)}><Trash2 size={14} /></button>
                                                 </div>
                                             </>
                                         )}
                                     </div>
                                 ))}
-                                {expenses.length === 0 && !isAddingExpense && (
-                                    <div style={{ padding: 20, textAlign: 'center', color: 'var(--text-muted)', fontStyle: 'italic' }}>
-                                        No transactions yet.
-                                    </div>
-                                )}
                             </div>
                         </div>
-                    </div>
 
-                    {/* Right Column — Comments + Actions */}
-                    <div className={styles.sideCol}>
-                        <CommentsSection cardId={cardId} boardId={boardId} initialComments={comments} />
-
-                        <div className={styles.sidebarActions}>
-                            <h3 className={styles.sidebarActionsTitle}>Actions</h3>
+                        <div className={styles.section} style={{ marginTop: 32 }}>
                             <button className={`${styles.sidebarButton} ${styles.deleteButton}`} onClick={handleDeleteCard} disabled={isLoading}>
                                 <span style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                                    <Trash2 size={16} /> Delete
+                                    <Trash2 size={16} /> Delete Card
                                 </span>
                             </button>
                         </div>
+                    </div>
+
+                    {/* RIGHT COLUMN (Sidebar) */}
+                    <div className={styles.sideCol}>
+                        <CommentsSection cardId={cardId} boardId={boardId} initialComments={comments} />
                     </div>
                 </div>
             </div>

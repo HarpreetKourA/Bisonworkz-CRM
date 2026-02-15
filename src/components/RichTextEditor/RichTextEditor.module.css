@@ -1,0 +1,117 @@
+/* Dark Theme Editor Styles */
+.editorWrapper {
+    border: 1px solid #383a3f;
+    border-radius: 3px;
+    overflow: hidden;
+    background: #22272b;
+    transition: all 0.2s ease;
+}
+
+.editorWrapper:focus-within {
+    border-color: #579dff;
+    box-shadow: none;
+}
+
+.toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2px;
+    padding: 4px 8px;
+    background: transparent;
+    border-bottom: 1px solid #383a3f;
+}
+
+.toolbarButton {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border: none;
+    background: transparent;
+    color: #9fadbc;
+    border-radius: 3px;
+    cursor: pointer;
+    transition: background 0.1s ease;
+}
+
+.toolbarButton:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: #b6c2cf;
+}
+
+.isActive {
+    background: rgba(255, 255, 255, 0.15);
+    color: #579dff;
+}
+
+.isActive:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.editorContent {
+    min-height: 120px;
+    padding: 12px;
+    color: #b6c2cf;
+    font-size: 14px;
+    line-height: 20px;
+    background: #22272b;
+}
+
+/* Tiptap specific styles */
+.editorContent :global(.ProseMirror) {
+    outline: none;
+    min-height: 120px;
+}
+
+.editorContent :global(.ProseMirror)>*+* {
+    margin-top: 0.75em;
+}
+
+.editorContent :global(.ProseMirror) ul,
+.editorContent :global(.ProseMirror) ol {
+    padding: 0 1rem;
+}
+
+.editorContent :global(.ProseMirror) h1,
+.editorContent :global(.ProseMirror) h2,
+.editorContent :global(.ProseMirror) h3 {
+    color: #dcdfe4;
+    font-weight: 600;
+    line-height: 1.25;
+}
+
+.editorContent :global(.ProseMirror) code {
+    background-color: rgba(255, 255, 255, 0.1);
+    color: #e56b6f;
+    padding: 0.2em 0.4em;
+    border-radius: 3px;
+}
+
+.editorContent :global(.ProseMirror) pre {
+    background: #000;
+    color: #b6c2cf;
+    font-family: monospace;
+    padding: 0.75rem 1rem;
+    border-radius: 4px;
+}
+
+.editorContent :global(.ProseMirror) blockquote {
+    padding-left: 1rem;
+    border-left: 3px solid #579dff;
+    color: #9fadbc;
+}
+
+.editorContent :global(.ProseMirror) hr {
+    border: none;
+    border-top: 1px solid #383a3f;
+    margin: 1rem 0;
+}
+
+.editorContent :global(.ProseMirror p.is-editor-empty:first-child::before) {
+    color: #9fadbc;
+    content: attr(data-placeholder);
+    float: left;
+    height: 0;
+    pointer-events: none;
+}

@@ -13,6 +13,16 @@ interface RevenueChartProps {
 }
 
 export default function RevenueChart({ data }: RevenueChartProps) {
+    const [isMounted, setIsMounted] = React.useState(false)
+
+    React.useEffect(() => {
+        setIsMounted(true)
+    }, [])
+
+    if (!isMounted) {
+        return <div className={styles.chartContainer} style={{ background: '#f9fafb' }} />
+    }
+
     if (!data || data.length === 0) {
         return <div className={styles.noData}>No data available</div>
     }

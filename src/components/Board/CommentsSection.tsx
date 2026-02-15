@@ -58,31 +58,41 @@ export default function CommentsSection({ cardId, boardId, initialComments }: Co
 
     return (
         <div className={styles.commentsSection}>
-            <div className={styles.commentsSectionHeader}>
-                <MessageSquare size={18} className={styles.icon} />
-                <h3 className={styles.sectionTitle}>Comments</h3>
-            </div>
-
-            <div className={styles.commentInputWrap}>
-                <input
-                    type="text"
-                    className={styles.commentInput}
-                    placeholder="Write a comment..."
-                    value={newComment}
-                    onChange={(e) => setNewComment(e.target.value)}
-                    onKeyDown={(e) => { if (e.key === 'Enter') handleSubmit() }}
-                />
-                <button
-                    className={styles.commentSendBtn}
-                    onClick={handleSubmit}
-                    disabled={isSubmitting || !newComment.trim()}
-                >
-                    <Send size={16} />
+            <div className={styles.sectionHeader} style={{ justifyContent: 'space-between', marginBottom: 16 }}>
+                <div style={{ display: 'flex', alignItems: 'center' }}>
+                    <MessageSquare size={20} className={styles.icon} />
+                    <h3 className={styles.sectionTitle}>Comments and activity</h3>
+                </div>
+                <button className={styles.sidebarButton} style={{ width: 'auto', fontSize: 13, padding: '4px 8px', height: 'auto' }}>
+                    Show details
                 </button>
             </div>
 
+            <div className={styles.commentInputWrapper}>
+                <div className={styles.currentUserAvatar}>
+                    B
+                </div>
+                <div className={styles.inputContainer}>
+                    <input
+                        type="text"
+                        className={styles.commentInput}
+                        placeholder="Write a comment..."
+                        value={newComment}
+                        onChange={(e) => setNewComment(e.target.value)}
+                        onKeyDown={(e) => { if (e.key === 'Enter') handleSubmit() }}
+                    />
+                    <button
+                        className={styles.commentSubmitBtn}
+                        onClick={handleSubmit}
+                        disabled={!newComment.trim()}
+                    >
+                        Save
+                    </button>
+                </div>
+            </div>
+
             {error && (
-                <div style={{ color: '#dc2626', fontSize: '0.8125rem', padding: '4px 8px', background: '#fee2e2', borderRadius: '6px' }}>
+                <div style={{ color: '#dc2626', fontSize: '13px', padding: '8px', background: '#fee2e2', borderRadius: '4px', marginBottom: 12 }}>
                     ⚠️ {error}
                 </div>
             )}
@@ -93,26 +103,24 @@ export default function CommentsSection({ cardId, boardId, initialComments }: Co
                         <div className={styles.commentAvatar}>
                             {(comment.full_name || comment.email || 'U').charAt(0).toUpperCase()}
                         </div>
-                        <div className={styles.commentBody}>
-                            <div className={styles.commentMeta}>
-                                <strong>{comment.full_name || comment.email || 'User'}</strong>
+                        <div className={styles.commentContentWrapper}>
+                            <div className={styles.commentHeader}>
+                                <span className={styles.commentAuthor}>{comment.full_name || comment.email || 'BisonWorkz'}</span>
+                                <span className={styles.commentAction}> added a comment </span>
                                 <span className={styles.commentDate}>{formatDate(comment.created_at)}</span>
                             </div>
-                            <p className={styles.commentContent}>{comment.content}</p>
-                        </div>
-                        <div className={styles.commentActions}>
-                            <button
-                                className={styles.commentDeleteBtn}
-                                onClick={() => handleDelete(comment.id)}
-                                title="Delete comment"
-                            >
-                                <Trash2 size={13} />
-                            </button>
+                            <div className={styles.commentBubble}>
+                                {comment.content}
+                            </div>
+                            <div className={styles.commentFooter}>
+                                <button className={styles.commentLink}>Reply</button>
+                                <button className={styles.commentLink} onClick={() => handleDelete(comment.id)}>Delete</button>
+                            </div>
                         </div>
                     </div>
                 ))}
                 {comments.length === 0 && (
-                    <p className={styles.noComments}>No comments yet.</p>
+                    <p className={styles.noComments} style={{ marginLeft: 40 }}>No activity recorded yet.</p>
                 )}
             </div>
         </div>

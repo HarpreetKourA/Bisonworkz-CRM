@@ -40,6 +40,7 @@ export default function CreateCard({ listId, boardId }: { listId: string, boardI
                     style={{
                         marginBottom: '8px',
                         background: 'white',
+                        color: 'black',
                         resize: 'none',
                         height: '60px',
                         padding: '8px 12px',

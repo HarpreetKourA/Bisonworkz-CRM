@@ -60,6 +60,9 @@ export default function BoardsPage() {
         try {
             await createBoard(formData)
         } catch (error: any) {
+            if (error.message === 'NEXT_REDIRECT' || error.message?.includes('NEXT_REDIRECT')) {
+                return
+            }
             console.error('Create board error:', error)
             alert(error?.message || 'Failed to create board. Please try again.')
         }

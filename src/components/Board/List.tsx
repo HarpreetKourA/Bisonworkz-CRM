@@ -46,6 +46,7 @@ export default async function List({ id, title, boardId }: ListProps) {
                             title={card.title}
                             description={card.description}
                             listId={id}
+                            listName={title}
                             boardId={boardId}
                             expense_summary={card.expense_summary}
                             expense_credits={card.expense_credits}
