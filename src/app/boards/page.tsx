@@ -56,6 +56,15 @@ export default function BoardsPage() {
         }
     }
 
+    async function handleCreateBoard(formData: FormData) {
+        try {
+            await createBoard(formData)
+        } catch (error: any) {
+            console.error('Create board error:', error)
+            alert(error?.message || 'Failed to create board. Please try again.')
+        }
+    }
+
     return (
         <div className={styles.container}>
             <div className={styles.header}>
@@ -115,7 +124,7 @@ export default function BoardsPage() {
                 }}>
                     <div className={styles.modalContent}>
                         <h2 className={styles.modalTitle}>Create Board</h2>
-                        <form action={createBoard}>
+                        <form action={handleCreateBoard}>
                             <div className="group">
                                 <label className="label">Board Title</label>
                                 <input

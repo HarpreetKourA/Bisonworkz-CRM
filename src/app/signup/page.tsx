@@ -1,5 +1,8 @@
+import { Suspense } from 'react'
 import { signup } from '@/app/auth/actions'
 import GoogleSignInButton from '@/app/auth/GoogleSignInButton'
+import PasswordInput from '@/components/PasswordInput/PasswordInput'
+import AuthMessage from '@/components/AuthMessage/AuthMessage'
 import styles from './page.module.css'
 
 export default function SignupPage() {
@@ -8,6 +11,11 @@ export default function SignupPage() {
             <div className={styles.formCard}>
                 <h1 className={styles.formTitle}>Create Account</h1>
                 <p className={styles.formSubtitle}>Get started with Bisonworkz CRM</p>
+
+                <Suspense>
+                    <AuthMessage />
+                </Suspense>
+
                 <form className={styles.form}>
                     <div className="group">
                         <label htmlFor="email" className="label">Email</label>
@@ -15,7 +23,7 @@ export default function SignupPage() {
                     </div>
                     <div className="group">
                         <label htmlFor="password" className="label">Password</label>
-                        <input id="password" name="password" type="password" required className="input" placeholder="••••••••" />
+                        <PasswordInput />
                     </div>
                     <button formAction={signup} className="btn btn-primary" style={{ width: '100%' }}>Sign Up</button>
                 </form>

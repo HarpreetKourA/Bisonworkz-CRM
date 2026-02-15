@@ -1,6 +1,7 @@
 'use server'
 
 import { createClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/admin'
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 
@@ -141,6 +142,10 @@ export async function createBoard(formData: FormData) {
 
     console.log('Attempting to create board for user:', user.id)
 
+    // Ensure the user has a row in public.users / profiles table
+    // The DB trigger may not have fired, or the table name may differ
+    await ensureUserProfile(user)
+
     const { data, error } = await supabase
         .from('boards')
         .insert({
@@ -160,8 +165,70 @@ export async function createBoard(formData: FormData) {
 
     revalidatePath('/boards')
     redirect(`/boards/${data!.id}`)
-    revalidatePath('/boards')
-    redirect(`/boards/${data!.id}`)
+}
+
+/**
+ * Ensures the authenticated user has a row in the public user/profile tables.
+ * Uses the admin client (service role key) to bypass RLS, since the users/profiles
+ * table has RLS enabled but no INSERT policy for regular users.
+ */
+async function ensureUserProfile(user: any) {
+    let adminClient: any
+    try {
+        adminClient = createAdminClient()
+    } catch (e: any) {
+        console.error('ensureUserProfile: Could not create admin client:', e?.message)
+        console.error('Make sure SUPABASE_SERVICE_ROLE_KEY is set in .env.local')
+        return
+    }
+
+    // Try 'profiles' table (commonly used in Supabase projects)
+    try {
+        const { data: profile } = await adminClient
+            .from('profiles')
+            .select('id')
+            .eq('id', user.id)
+            .maybeSingle()
+
+        if (!profile) {
+            console.log('No profile found for user', user.id, '— creating one.')
+            const { error } = await adminClient
+                .from('profiles')
+                .upsert({
+                    id: user.id,
+                    email: user.email,
+                    role: 'viewer',
+                }, { onConflict: 'id' })
+            if (error) console.warn('Could not upsert into profiles:', error.message)
+            else console.log('Profile created successfully for user', user.id)
+        }
+    } catch (e: any) {
+        console.warn('ensureUserProfile: profiles table check failed:', e?.message)
+    }
+
+    // Also try 'users' table (defined in schema.sql, FK target for boards.owner_id)
+    try {
+        const { data: userRow } = await adminClient
+            .from('users')
+            .select('id')
+            .eq('id', user.id)
+            .maybeSingle()
+
+        if (!userRow) {
+            console.log('No users row found for user', user.id, '— creating one.')
+            const { error } = await adminClient
+                .from('users')
+                .upsert({
+                    id: user.id,
+                    email: user.email,
+                    role: 'viewer',
+                }, { onConflict: 'id' })
+            if (error) console.warn('Could not upsert into users:', error.message)
+            else console.log('Users row created successfully for user', user.id)
+        }
+    } catch (e: any) {
+        console.warn('ensureUserProfile: users table check failed:', e?.message)
+    }
 }
 
 export async function deleteBoard(boardId: string) {
