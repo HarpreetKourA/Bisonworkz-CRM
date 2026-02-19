@@ -221,6 +221,7 @@ export default function BoardCanvas({ boardId, initialLists }: BoardCanvasProps)
                                                                             title={card.title}
                                                                             description={card.description}
                                                                             listId={list.id}
+                                                                            listName={list.title}
                                                                             boardId={boardId}
                                                                             expense_summary={card.expense_summary}
                                                                             expense_credits={card.expense_credits}
